@@ -156,11 +156,21 @@ img, video, canvas, svg {
   font-family: var(--font-display); font-weight: 700;
   font-size: 46px; line-height: 1.15; letter-spacing: .01em;
 }
-/* 内容区：固定在页眉与页脚之间 */
+/* 内容区：固定在页眉与页脚之间，内容垂直铺满 */
 .s-body {
   position: absolute; left: 120px; right: 150px; top: 148px; bottom: 64px;
-  padding-top: 24px; overflow: hidden;
+  padding: 12px 0 8px; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-evenly; gap: 10px;
 }
+/* 栏/网格/步骤条撑满内容区高度，内部元素均匀分布，消除下半页留白 */
+.s-body > .cols { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+.s-body > .grid2, .s-body > .grid3 { flex: 1 1 auto; min-height: 0; align-content: stretch; grid-auto-rows: 1fr; }
+.s-body > .steps { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+.cols > div { display: flex; flex-direction: column; justify-content: space-evenly; }
+.grid2 > .card, .grid3 > .card, .steps .step { display: flex; flex-direction: column; justify-content: center; }
+.s-body > table { margin: 0; }
+/* 稀疏表格页：加高行距让表格撑满版面 */
+table.roomy th, table.roomy td { padding: 20px 14px; }
 /* 固定页脚 */
 .s-foot {
   position: absolute; left: 120px; right: 150px; bottom: 0; height: 64px;
@@ -502,7 +512,7 @@ body.editing .edit-banner { display: block; }
 <section class="slide" data-section="1">
   <header class="s-head"><div class="kicker">01 · 实验目标</div><h2 class="reveal">课程设计任务书（总览）</h2></header>
   <div class="s-body">
-    <table class="reveal">
+    <table class="reveal roomy">
       <tr><th style="width:13%">任务</th><th style="width:29%">输入 → 输出</th><th style="width:30%">数据集构建</th><th>评测指标</th></tr>
       <tr>
         <td><strong>图像分类</strong></td>
@@ -1839,6 +1849,11 @@ body.editing .edit-banner { display: block; }
         </g>
       </svg>
     </div>
+    <div class="grid3 mt">
+      <div class="card reveal"><h3>为什么要"冻结"？</h3><p class="small">预训练知识是花大价钱学来的；小数据上全量更新容易<b>灾难性遗忘</b> —— 冻结就是给已有能力"上保险"。</p></div>
+      <div class="card leaf reveal"><h3>冻结谁、解冻谁？</h3><p class="small">越<b>通用</b>的模块越倾向冻结（视觉编码器）；越<b>任务相关</b>的越倾向解冻（Projector、LLM 末层）。</p></div>
+      <div class="card gold reveal"><h3>这是实验变量！</h3><p class="small">冻结策略直接决定效果与显存，是课程设计里<b>最值得做消融</b>的维度 —— 下一页给出四种策略的对比。</p></div>
+    </div>
   </div>
   <footer class="s-foot"><span>mini-vlm · 课程设计</span><span class="pg"></span></footer>
 </section>
@@ -1847,7 +1862,7 @@ body.editing .edit-banner { display: block; }
 <section class="slide" data-section="3">
   <header class="s-head"><div class="kicker">03 · 训练</div><h2 class="reveal">冻结策略的权衡（课程设计的重要实验变量）</h2></header>
   <div class="s-body">
-    <table class="reveal">
+    <table class="reveal roomy">
       <tr><th style="width:22%">策略</th><th style="width:26%">训练哪些参数</th><th style="width:26%">优点</th><th>风险 / 适用</th></tr>
       <tr><td><b>只训 Projector</b></td><td>~1M</td><td>最省显存；LLM 能力零损耗</td><td>对齐程度有限；适合 Pretrain 阶段</td></tr>
       <tr><td><b>解冻 LLM 首/末层</b><br><span class="small muted">minimind-v 默认</span></td><td>Projector + LLM 第 1 层与最后 1 层</td><td>首层做跨模态融合、末层管回答风格，中间层保住语言知识</td><td>小模型 + 图文数据占比高时的稳妥折中</td></tr>
@@ -2122,7 +2137,7 @@ body.editing .edit-banner { display: block; }
 <section class="slide" data-section="4">
   <header class="s-head"><div class="kicker">04 · 检测</div><h2 class="reveal">补充："坐标即文本"并非野路子，而是主流做法</h2></header>
   <div class="s-body">
-    <table class="reveal">
+    <table class="reveal roomy">
       <tr><th style="width:16%">工作</th><th style="width:12%">年份</th><th>做法</th></tr>
       <tr><td><b>Pix2Seq</b>（Google）</td><td>2021</td><td>首次把检测框坐标<b>离散化为 token</b>，目标检测变成纯粹的序列生成问题</td></tr>
       <tr><td><b>OFA</b></td><td>2022</td><td>用统一序列生成框架覆盖 caption、VQA、检测、定位等 8 类任务</td></tr>
